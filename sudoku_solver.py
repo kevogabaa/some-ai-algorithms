@@ -12,9 +12,9 @@ rows = "ABCDEFGHI"
 cols = digits
 squares = cross(rows, cols)
 unitlist = (
-        [cross(rows, c) for c in cols]
-        + [cross(r, cols) for r in rows]
-        + [cross(rs, cs) for rs in ("ABC", "DEF", "GHI") for cs in ("123", "456", "789")]
+    [cross(rows, c) for c in cols]
+    + [cross(r, cols) for r in rows]
+    + [cross(rs, cs) for rs in ("ABC", "DEF", "GHI") for cs in ("123", "456", "789")]
 )
 units = {s: [u for u in unitlist if s in u] for s in squares}
 peers = {s: set(sum(units[s], [])) - {s} for s in squares}  # noqa: RUF017
@@ -41,13 +41,13 @@ def test():
 
 
 def parse_grid(grid):
-    """Convert grid to a dict of possible values, {square: digits}, or return
-    False if a contradiction is detected."""
-    ## To start, every square can be any digit; then assign values from the grid.
+    """Convert grid to a dict of possible values, {square: digits}, or return False if a
+    contradiction is detected."""
+    # To start, every square can be any digit; then assign values from the grid.
     values = {s: digits for s in squares}
     for s, d in grid_values(grid).items():
         if d in digits and not assign(values, s, d):
-            return False  ## (Fail if we can't assign d to square s.)
+            return False  # (Fail if we can't assign d to square s.)
     return values
 
 
@@ -76,20 +76,20 @@ def eliminate(values, s, d):
     Return values, except return False if a contradiction is detected.
     """
     if d not in values[s]:
-        return values  ## Already eliminated
+        return values  # Already eliminated
     values[s] = values[s].replace(d, "")
-    ## (1) If a square s is reduced to one value d2, then eliminate d2 from the peers.
+    # (1) If a square s is reduced to one value d2, then eliminate d2 from the peers.
     if len(values[s]) == 0:
-        return False  ## Contradiction: removed last value
+        return False  # Contradiction: removed last value
     elif len(values[s]) == 1:
         d2 = values[s]
         if not all(eliminate(values, s2, d2) for s2 in peers[s]):
             return False
-    ## (2) If a unit u is reduced to only one place for a value d, then put it there.
+    # (2) If a unit u is reduced to only one place for a value d, then put it there.
     for u in units[s]:
         dplaces = [s for s in u if d in values[s]]
         if len(dplaces) == 0:
-            return False  ## Contradiction: no place for this value
+            return False  # Contradiction: no place for this value
         # d can only be in one place in unit; assign it there
         elif len(dplaces) == 1 and not assign(values, dplaces[0], d):
             return False
@@ -101,11 +101,7 @@ def display(values):
     width = 1 + max(len(values[s]) for s in squares)
     line = "+".join(["-" * (width * 3)] * 3)
     for r in rows:
-        print(
-            "".join(
-                values[r + c].center(width) + ("|" if c in "36" else "") for c in cols
-            )
-        )
+        print("".join(values[r + c].center(width) + ("|" if c in "36" else "") for c in cols))
         if r in "CF":
             print(line)
     print()
@@ -126,10 +122,10 @@ def some(seq):
 def search(values):
     "Using depth-first search and propagation, try all possible values."
     if values is False:
-        return False  ## Failed earlier
+        return False  # Failed earlier
     if all(len(values[s]) == 1 for s in squares):
-        return values  ## Solved!
-    ## Chose the unfilled square s with the fewest possibilities
+        return values  # Solved!
+    # Chose the unfilled square s with the fewest possibilities
     n, s = min((len(values[s]), s) for s in squares if len(values[s]) > 1)
     return some(search(assign(values.copy(), s, d)) for d in values[s])
 
@@ -137,15 +133,15 @@ def search(values):
 def solve_all(grids, name="", showif=0.0):
     """Attempt to solve a sequence of grids.
 
-    Report results. When showif is a number of seconds, display puzzles
-    that take longer. When showif is None, don't display any puzzles.
+    Report results. When showif is a number of seconds, display puzzles that take longer. When
+    showif is None, don't display any puzzles.
     """
 
     def time_solve(grid):
         start = time.monotonic()
         values = solve(grid)
         t = time.monotonic() - start
-        ## Display puzzles that take long enough
+        # Display puzzles that take long enough
         if showif is not None and t > showif:
             display(grid_values(grid))
             if values:
@@ -178,9 +174,8 @@ def from_file(filename, sep="\n"):
 def random_puzzle(assignments=17):
     """Make a random puzzle with N or more assignments.
 
-    Restart on contradictions. Note the resulting puzzle is not
-    guaranteed to be solvable, but empirically about 99.8% of them are
-    solvable. Some have multiple solutions.
+    Restart on contradictions. Note the resulting puzzle is not guaranteed to be solvable, but
+    empirically about 99.8% of them are solvable. Some have multiple solutions.
     """
     values = {s: digits for s in squares}
     for s in shuffled(squares):
@@ -189,7 +184,7 @@ def random_puzzle(assignments=17):
         ds = [values[s] for s in squares if len(values[s]) == 1]
         if len(ds) >= assignments and len(set(ds)) >= 8:
             return "".join(values[s] if len(values[s]) == 1 else "." for s in squares)
-    return random_puzzle(assignments)  ## Give up and make a new puzzle
+    return random_puzzle(assignments)  # Give up and make a new puzzle
 
 
 def shuffled(seq):
@@ -199,15 +194,9 @@ def shuffled(seq):
     return seq
 
 
-grid1 = (
-    "003020600900305001001806400008102900700000008006708200002609500800203009005010300"
-)
-grid2 = (
-    "4.....8.5.3..........7......2.....6.....8.4......1.......6.3.7.5..2.....1.4......"
-)
-hard1 = (
-    ".....6....59.....82....8....45........3........6..3.54...325..6.................."
-)
+grid1 = "003020600900305001001806400008102900700000008006708200002609500800203009005010300"
+grid2 = "4.....8.5.3..........7......2.....6.....8.4......1.......6.3.7.5..2.....1.4......"
+hard1 = ".....6....59.....82....8....45........3........6..3.54...325..6.................."
 
 if __name__ == "__main__":
     test()

@@ -1,11 +1,8 @@
-"""
-Minimax helps to achieve maximum score in a game by checking all possible moves
-depth is current depth in game tree.
+"""Minimax helps to achieve maximum score in a game by checking all possible moves depth is current
+depth in game tree.
 
-nodeIndex is index of current node in scores[].
-if move is of maximizer return true else false
-leaves of game tree is stored in scores[]
-height is maximum height of Game tree
+nodeIndex is index of current node in scores[]. if move is of maximizer return true else false
+leaves of game tree is stored in scores[] height is maximum height of Game tree
 """
 
 from __future__ import annotations
@@ -13,14 +10,10 @@ from __future__ import annotations
 import math
 
 
-def minimax(
-    depth: int, node_index: int, is_max: bool, scores: list[int], height: float
-) -> int:
-    """
-    This function implements the minimax algorithm, which helps achieve the optimal
-    score for a player in a two-player game by checking all possible moves.
-    If the player is the maximizer, then the score is maximized.
-    If the player is the minimizer, then the score is minimized.
+def minimax(depth: int, node_index: int, is_max: bool, scores: list[int], height: float) -> int:
+    """This function implements the minimax algorithm, which helps achieve the optimal score for a
+    player in a two-player game by checking all possible moves. If the player is the maximizer,
+    then the score is maximized. If the player is the minimizer, then the score is minimized.
 
     Parameters:
     - depth: Current depth in the game tree.
