@@ -106,7 +106,18 @@ class TicTacToe:
                 break
 
             if current_player == "X":
-                move = int(input("Enter your move (0-8): "))
+                while True:
+                    try:
+                        move = int(input("Enter your move (0-8): "))
+                        if move in range(9) and self.board[move] == " ":
+                            break
+                        else:
+                            error = (
+                                "between 0 and 8 that corresponds to an empty spot on the board."
+                            )
+                            print(f"Invalid move. Please enter a number {error}")
+                    except ValueError:
+                        print("Invalid input. Please enter a number.")
                 self.make_move(move, current_player)
             else:
                 print("Computer's turn...")
@@ -118,7 +129,7 @@ class TicTacToe:
 def main():
     """The main function to start the game."""
     # Usage
-    depth = int(input("Enter the depth for the Expectimax algorithm (default is 10): "))
+    depth = int(input("Enter the depth for the Minimax algorithm (default is 10): "))
     game = TicTacToe()
     game.play(depth) if depth > 10 else game.play()
 
