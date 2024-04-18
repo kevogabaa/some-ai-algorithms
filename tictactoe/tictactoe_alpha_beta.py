@@ -26,6 +26,7 @@ class TicTacToe:
 
     def make_move(self, position, player):
         """Makes a move on the board."""
+        # check if the move is valid
         self.board[position] = player
 
     def check_winner(self, player):
@@ -55,8 +56,8 @@ class TicTacToe:
         else:
             return 0
 
-    def expectimax(self, depth, player):
-        """Implements the Expectimax algorithm for decision making."""
+    def alphabeta(self, alpha, beta, depth, player):
+        """Implements the Alpha-Beta pruning algorithm for decision making."""
         if depth == 0 or self.num_empty_squares() == 0:
             return self.evaluate_board()
 
@@ -64,26 +65,40 @@ class TicTacToe:
             max_eval = -math.inf
             for move in self.available_moves():
                 self.make_move(move, player)
-                eval = self.expectimax(depth - 1, "O")  # Switch to opponent's turn
+                eval = self.alphabeta(alpha, beta, depth - 1, "O")  # Switch to opponent's turn
                 self.make_move(move, " ")  # Undo move
                 max_eval = max(max_eval, eval)
+                alpha = max(alpha, eval)
+                if beta <= alpha:
+                    break
             return max_eval
-        else:  # Chance node (Opponent's turn)
-            total_eval = 0
+        else:  # Minimizing player
+            min_eval = math.inf
             for move in self.available_moves():
                 self.make_move(move, player)
-                eval = self.expectimax(depth - 1, "X")  # Switch to maximizing player's turn
+                eval = self.alphabeta(
+                    alpha, beta, depth - 1, "X"
+                )  # Switch to maximizing player's turn
                 self.make_move(move, " ")  # Undo move
-                total_eval += eval
-            return total_eval / len(self.available_moves())
+                min_eval = min(min_eval, eval)
+                beta = min(beta, eval)
+                if beta <= alpha:
+                    break
+            return min_eval
 
     def best_move(self, player, depth):
         """Returns the best move for the given player."""
         best_eval = -math.inf if player == "X" else math.inf
         best_move = None
+        alpha = -math.inf
+        beta = math.inf
         for move in self.available_moves():
             self.make_move(move, player)
-            eval = self.expectimax(depth, "O") if player == "X" else self.expectimax(depth, "X")
+            eval = (
+                self.alphabeta(alpha, beta, depth, "O")
+                if player == "X"
+                else self.alphabeta(alpha, beta, depth, "X")
+            )
             self.make_move(move, " ")
             if (player == "X" and eval > best_eval) or (player == "O" and eval < best_eval):
                 best_eval = eval

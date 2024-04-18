@@ -17,7 +17,7 @@ unitlist = (
     + [cross(rs, cs) for rs in ("ABC", "DEF", "GHI") for cs in ("123", "456", "789")]
 )
 units = {s: [u for u in unitlist if s in u] for s in squares}
-peers = {s: set(sum(units[s], [])) - {s} for s in squares}  # noqa: RUF017
+peers = {s: set(sum(units[s], [])) - {s} for s in squares}
 
 
 def test():
@@ -31,23 +31,38 @@ def test():
         ["C1", "C2", "C3", "C4", "C5", "C6", "C7", "C8", "C9"],
         ["A1", "A2", "A3", "B1", "B2", "B3", "C1", "C2", "C3"],
     ]
-    # fmt: off
     assert peers["C2"] == {
-        "A2", "B2", "D2", "E2", "F2", "G2", "H2", "I2", "C1", "C3",
-        "C4", "C5", "C6", "C7", "C8", "C9", "A1", "A3", "B1", "B3"
+        "A2",
+        "B2",
+        "D2",
+        "E2",
+        "F2",
+        "G2",
+        "H2",
+        "I2",
+        "C1",
+        "C3",
+        "C4",
+        "C5",
+        "C6",
+        "C7",
+        "C8",
+        "C9",
+        "A1",
+        "A3",
+        "B1",
+        "B3",
     }
-    # fmt: on
     print("All tests pass.")
 
 
 def parse_grid(grid):
     """Convert grid to a dict of possible values, {square: digits}, or return False if a
     contradiction is detected."""
-    # To start, every square can be any digit; then assign values from the grid.
     values = {s: digits for s in squares}
     for s, d in grid_values(grid).items():
         if d in digits and not assign(values, s, d):
-            return False  # (Fail if we can't assign d to square s.)
+            return False
     return values
 
 
@@ -76,21 +91,18 @@ def eliminate(values, s, d):
     Return values, except return False if a contradiction is detected.
     """
     if d not in values[s]:
-        return values  # Already eliminated
+        return values
     values[s] = values[s].replace(d, "")
-    # (1) If a square s is reduced to one value d2, then eliminate d2 from the peers.
     if len(values[s]) == 0:
-        return False  # Contradiction: removed last value
+        return False
     elif len(values[s]) == 1:
         d2 = values[s]
         if not all(eliminate(values, s2, d2) for s2 in peers[s]):
             return False
-    # (2) If a unit u is reduced to only one place for a value d, then put it there.
     for u in units[s]:
         dplaces = [s for s in u if d in values[s]]
         if len(dplaces) == 0:
-            return False  # Contradiction: no place for this value
-        # d can only be in one place in unit; assign it there
+            return False
         elif len(dplaces) == 1 and not assign(values, dplaces[0], d):
             return False
     return values
@@ -122,12 +134,11 @@ def some(seq):
 def search(values):
     "Using depth-first search and propagation, try all possible values."
     if values is False:
-        return False  # Failed earlier
+        return False
     if all(len(values[s]) == 1 for s in squares):
-        return values  # Solved!
-    # Chose the unfilled square s with the fewest possibilities
+        return values
     n, s = min((len(values[s]), s) for s in squares if len(values[s]) > 1)
-    return some(search(assign(values.copy(), s, d)) for d in values[s])
+    return some(search(assign(values.copy(), s, d)) for d in sorted(values[s]))
 
 
 def solve_all(grids, name="", showif=0.0):
@@ -141,7 +152,6 @@ def solve_all(grids, name="", showif=0.0):
         start = time.monotonic()
         values = solve(grid)
         t = time.monotonic() - start
-        # Display puzzles that take long enough
         if showif is not None and t > showif:
             display(grid_values(grid))
             if values:
@@ -168,7 +178,7 @@ def solved(values):
 
 def from_file(filename, sep="\n"):
     "Parse a file into a list of strings, separated by sep."
-    return open(filename).read().strip().split(sep)  # noqa: SIM115
+    return open(filename).read().strip().split(sep)
 
 
 def random_puzzle(assignments=17):
@@ -184,7 +194,7 @@ def random_puzzle(assignments=17):
         ds = [values[s] for s in squares if len(values[s]) == 1]
         if len(ds) >= assignments and len(set(ds)) >= 8:
             return "".join(values[s] if len(values[s]) == 1 else "." for s in squares)
-    return random_puzzle(assignments)  # Give up and make a new puzzle
+    return random_puzzle(assignments)
 
 
 def shuffled(seq):
@@ -200,13 +210,10 @@ hard1 = ".....6....59.....82....8....45........3........6..3.54...325..6........
 
 if __name__ == "__main__":
     test()
-    # solve_all(from_file("easy50.txt", '========'), "easy", None)
-    # solve_all(from_file("top95.txt"), "hard", None)
-    # solve_all(from_file("hardest.txt"), "hardest", None)
     solve_all([random_puzzle() for _ in range(99)], "random", 100.0)
-    for puzzle in (grid1, grid2):  # , hard1):  # Takes 22 sec to solve on my M1 Mac.
-        display(parse_grid(puzzle))
+    for puzzle in (grid1, grid2, hard1):
         start = time.monotonic()
-        solve(puzzle)
+        result = "".join(solve(puzzle).values())
+        display(parse_grid(result))
         t = time.monotonic() - start
         print("Solved: %.5f sec" % t)
